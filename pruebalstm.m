@@ -1,7 +1,8 @@
-    ADS = audioDatastore("C:\Users\vanii\OneDrive\Documentos\mexican_dataset_aumented\mexican_dataset","IncludeSubfolders",true,'FileExtension','.wav','LabelSource','foldernames');
+%%%Audio Dataset%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
+ADS = audioDatastore("C:\Users\vanii\OneDrive\Documentos\mexican_dataset_aumented\mexican_dataset","IncludeSubfolders",true,'FileExtension','.wav','LabelSource','foldernames');
 % 
 % % %%%%%%perform augmentation%%%%%%%%%%%%%%%%%%
-% 
+% Uncomment if you wish to perform augmentation
 %   jj=numel(ADS.Files);
 % 
 % for i=jj
@@ -57,21 +58,12 @@ ylabel('Frequency','Interpreter','latex','FontSize',26)
  'SamplingFrequency',48000);
 
 % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%unknown%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
  rng default;
  ADS=shuffle(ADS);
-commands = categorical(["adios","amigo","apellido","bien","como","cual","cuando","donde","el","ella","estas","estoy","favor","gracias","hasta", ...
-    "hola","hombre","luego","mal","mi","mujer","nombre","para","por","quien","soy","tu"]);
-
-isCommand = ismember(ADS.Labels,commands);
-isUnknown = ~isCommand;
-includeFraction = 0.2;
-mask = rand(numel(ADS.Labels),1) < includeFraction;
-isUnknown = isUnknown & mask;
-ADS.Labels(isUnknown) = categorical("unknown")
-
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%Split
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%Dataset%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % ADSnew=subset(ADS,isCommand|isUnknown);
 % 
   countEachLabel(ADS)
@@ -114,13 +106,17 @@ while hasdata(s_catdsval)
     smat3=read(s_catdsval);
     Xval=[Xval smat3];
 end 
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%Extract wavelet coefficients%%%%%%%%%%%%%
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Strain = sf.featureMatrix(Xtrain);
 Stest = sf.featureMatrix(Xtest);
 Sval = sf.featureMatrix(Xval);
 
-% % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%Coefficient matrices for%%%%%%%%%%%%%%%%%%
+ %%%%%%training,testing and validation%%%%%%%%%%%
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 TrainFeatures=Strain(2:end,:,:);
 TrainFeatures=squeeze(num2cell(TrainFeatures,[1 2]));
