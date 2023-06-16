@@ -1,4 +1,4 @@
-%%%Audio Dataset%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
+%%Audio Dataset%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
 ADS = audioDatastore("C:\Users\vanii\OneDrive\Documentos\mexican_dataset_aumented\mexican_dataset","IncludeSubfolders",true,'FileExtension','.wav','LabelSource','foldernames');
 % 
 % % %%%%%%perform augmentation%%%%%%%%%%%%%%%%%%
@@ -124,6 +124,7 @@ TestFeatures = Stest(2:end,:,:);
 TestFeatures = squeeze(num2cell(TestFeatures, [1 2]));
 ValFeatures = Sval(2:end,:,:);
 ValFeatures = squeeze(num2cell(ValFeatures, [1 2]));
+%%%%%%%%%Architecture of GRU%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%Architecture of LSTM%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [InputSize,~]=size(TrainFeatures{1});
  Ytrain=adsTrain.Labels;
@@ -140,14 +141,12 @@ numclasses=numel(unique(Ytrain));
 
 layers = [
     sequenceInputLayer(InputSize)
-    lstmLayer(numhiddenunits1,'OutputMode','sequence')
+    gruLayer(numhiddenunits1,'OutputMode','sequence')
     dropoutLayer(0.5)
-    lstmLayer(numhiddenunits2,'OutputMode','sequence')
+    gruLayer(numhiddenunits2,'OutputMode','sequence')
     dropoutLayer(0.5)
-    lstmLayer(numhiddenunits3,'OutputMode','last')
+    gruLayer(numhiddenunits3,'OutputMode','last')
     dropoutLayer(0.5)
-    %lstmLayer(numhiddenunits4,'OutputMode','last')
-    %dropoutLayer(0.3)
     fullyConnectedLayer(numclasses)
     softmaxLayer
     classificationLayer];
@@ -160,7 +159,7 @@ options = trainingOptions('adam', ...
     'MiniBatchSize',miniBatchSize, ...
     'Verbose', false, ...
     'Plots','training-progress');
-%%%%%%%%Training and testing%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%Training and testing%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [net, tr]= trainNetwork(TrainFeatures,Ytrain,layers,options);
 % % % % 
 % % % % % % % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -176,4 +175,3 @@ options = trainingOptions('adam', ...
 %%%%%%%confusion matrix%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 fig = figure;
 cm = confusionchart(adsTest.Labels,predLabels);
-

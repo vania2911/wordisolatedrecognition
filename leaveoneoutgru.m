@@ -12,25 +12,27 @@ N=length(X);
 numhiddenunits3=200;
 %numhiddenunits4=200;
 
+
  
 numclasses=numel(unique(Ytrain));
 
-layers = [
+layersGRU = [ ...
     sequenceInputLayer(InputSize)
-    lstmLayer(numhiddenunits1,'OutputMode','sequence')
+    gruLayer(numhiddenunits1,'OutputMode','sequence')
     dropoutLayer(0.5)
-    lstmLayer(numhiddenunits2,'OutputMode','sequence')
+    gruLayer(numhiddenunits2,'OutputMode','sequence')
     dropoutLayer(0.5)
-    lstmLayer(numhiddenunits3,'OutputMode','last')
+   gruLayer(numhiddenunits3,'OutputMode','last')
     dropoutLayer(0.5)
-    %lstmLayer(numhiddenunits4,'OutputMode','last')
+    %gruLayer(numhiddenunits4,'OutputMode','last')
     %dropoutLayer(0.3)
-    fullyConnectedLayer(numclasses)
-    softmaxLayer
-    classificationLayer];
+fullyConnectedLayer(numclasses)
+softmaxLayer
+classificationLayer];
 
 maxEpochs =300;
 miniBatchSize = 50;
+%validationFrequency = floor(numel(numclasses)/miniBatchSize);
 options = trainingOptions('adam', ...
     'InitialLearnRate',0.0035,...
     'MaxEpochs',maxEpochs, ...
@@ -43,32 +45,30 @@ cp=classperf(C);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 sse=0;
 pred={};
-nety={};
+net={};
 tr={};
 testAccuracy={};
 yyy={};
-M=10;
 p={};
-rng('default');
+M=10;
 tic
 for i=1:10
     i
     [train, test]=crossvalind('LeaveMOut',N, ceil(N/M));
-    net = trainNetwork(X(train),Y(train),layers,options);
-    nety{i}=net;
-    p{i}=classify(nety{i},X(test));
+    net{i} = trainNetwork(X(train),Y(train),layersGRU,options);
+    p{i}=classify(net{i},X(test));
     yyy{i}=Y(test);
     testAccuracy{i} = sum(p{i}==yyy{i})/numel(p{i})*100;
     pp=cellstr(p{i});
     classperf(cp,pp,test);
-
-
 end
- cp.ErrorRate
- p=[p{:}];
+cp.ErrorRate
+p=[p{:}];
  pppp=reshape(p,[335*i,1]);
- yyy=[yyy{:}];
+  yyy=[yyy{:}];
  yyyy=reshape(yyy,[335*i,1]);
  cm= confusionchart(yyyy,pppp);
+
+
 
 toc
